@@ -1,0 +1,13 @@
+{
+    "sqltools.connections": [
+        {
+            "database": "toolrentaldb",
+            "dialect": "MariaDB",
+            "name": "maria",
+            "password": "P4ul0o0o--",
+            "port": 3306,
+            "server": "localhost",
+            "username": "root"
+        }
+    ]
+}
