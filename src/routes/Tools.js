@@ -12,7 +12,23 @@ router.get("/", (request, response, next) => {
       if (error) {
         return response.status(500).send({ error: error });
       }
-      return response.status(200).send({ response: result });
+      const res = {
+        quantidade: result.length,
+        ferramentas: result.map((tool) => {
+          return {
+            id_tools: tool.id_tools,
+            name: tool.name,
+            owner: tool.owner,
+            price: tool.price,
+            req: {
+              type: "GET",
+              description: "Retorna todos os produtos",
+              url: "http://localhost:3000/tools/" + tool.id_tools,
+            },
+          };
+        }),
+      };
+      return response.status(200).send({ res });
     });
   });
 });
@@ -31,15 +47,27 @@ router.post("/", (request, response, next) => {
         if (error) {
           return response.status(500).send({ error: error });
         }
-        response.status(201).send({
-          msg: "Ferramenta inserida!",
-          id_tool: result.insertId,
-        });
+        const res = {
+          mensagem: "Ferramenta iserida.",
+          toolCreated: {
+            id_tools: result.id_tools,
+            name: request.body.name,
+            owner: request.body.owner,
+            price: request.body.price,
+            req: {
+              type: "POST",
+              description: "Cadastrar ferramenta",
+              url: "http://localhost:3000/tools/",
+            },
+          },
+        };
+        return response.status(201).send({ res });
       }
     );
   });
 });
-//Buscara Ferramenta específica
+
+//Buscar Ferramenta específica
 router.get("/:id_tool", (request, response, next) => {
   mysql.getConnection((error, conn) => {
     if (error) {
@@ -52,7 +80,25 @@ router.get("/:id_tool", (request, response, next) => {
         if (error) {
           return response.status(500).send({ error: error });
         }
-        return response.status(200).send({ response: result });
+        if (result.length == 0) {
+          return response
+            .status(404)
+            .send({ message: "Sem ferramentas com esse ID" });
+        }
+        const res = {
+          ferramenta: {
+            id_tools: result[0].id_tools,
+            name: result[0].name,
+            owner: result[0].owner,
+            price: result[0].price,
+            req: {
+              type: "GET",
+              description: "Retorna uma ferramenta",
+              url: "http://localhost:3000/tools/" +request.body.id_tools,
+            },
+          },
+        };
+        return response.status(200).send({ res });
       }
     );
   });
@@ -77,9 +123,21 @@ router.patch("/", (request, response, next) => {
         if (error) {
           return response.status(500).send({ error: error });
         }
-        response.status(202).send({
-          msg: "Ferramenta alterada!",
-        });
+        const res = {
+          mensagem: "Ferramenta atualizada.",
+          toolUpdated: {
+            id_tools: request.body.id_tools,
+            name: request.body.name,
+            owner: request.body.owner,
+            price: request.body.price,
+            req: {
+              type: "POST",
+              description: "Atualizar ferramenta",
+              url: "http://localhost:3000/tools/" + request.body.id_tools,
+            },
+          },
+        };
+        return response.status(202).send({ res });
       }
     );
   });
@@ -99,9 +157,21 @@ router.delete("/", (request, response, next) => {
         if (error) {
           return response.status(500).send({ error: error });
         }
-        response.status(202).send({
-          msg: "Ferramenta removida!",
-        });
+        const res = {
+          message: 'Ferramenta removida',
+          req: {
+            type: 'DELETE',
+            description: 'Deleta uma ferramenta',
+            url: 'http://localhost:3000/tools',
+            body: {
+              name: 'String',
+              owner: 'String',
+              price: 'Number'
+            }
+
+          }
+        }
+        return response.status(202).send({res});
       }
     );
   });

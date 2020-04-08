@@ -13,12 +13,17 @@ router.post("/", (require, response, next) => {
   });
 });
 
-router.get("/:id_user", (require, response, next) => {
-  const id = require.params.id_user;
-
-  response.status(200).send({
-    msg: "lista um user específico",
-    id: id,
+router.get("/", (require, response, next) => {
+  mysql.getConnection((error, conn) => {
+    if (error) {
+      return response.status(500).send({ error: error });
+    }
+    conn.query("SELECT * FROM users;", (error, result, field) => {
+      if (error) {
+        return response.status(500).send({ error: error });
+      }
+      return response.status(200).send({ response: result });
+    });
   });
 });
 
