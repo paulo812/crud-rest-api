@@ -1,6 +1,7 @@
 const express = require("express");
 const routeTools = require("./routes/Tools");
 const routeRentals = require("./routes/Rentals");
+const routeUsers = require("./routes/Users");
 const morgan = require("morgan");
 const bodyParser = require('body-parser');
 
@@ -12,6 +13,7 @@ app.use(bodyParser.json());//json de entrada no body
 
 app.use("/tools", routeTools);
 app.use("/rentals", routeRentals);
+app.use("/users", routeUsers);
 
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');

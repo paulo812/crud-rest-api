@@ -33,6 +33,42 @@ router.get("/", (request, response, next) => {
   });
 });
 
+router.get("/:id_tools", (request, response, next) => {
+  mysql.getConnection((error, conn) => {
+    if (error) {
+      return response.status(500).send({ error: error });
+    }
+    conn.query(
+      "SELECT * FROM tools WHERE id_tools = ?;",
+      [request.params.id_tools],
+      (error, result, fields) => {
+        if (error) {
+          return response.status(500).send({ error: error });
+        }
+        if (result.length == 0) {
+          return result
+            .status(404)
+            .send({ msg: "Ferramenta não encontrada com este ID" });
+        }
+        const res = {
+          tool: {
+            id_tools: result[0].id_tools,
+            name: result[0].name,
+            owner: result[0].owner,
+            price: result[0].price,
+            req: {
+              type: "GET",
+              description: "Retorna um produto por ID",
+              url: "http://localhost:3000/tools/" + request.body.id_tools,
+            },
+          },
+        };
+        return response.status(200).send(res);
+      }
+    );
+  });
+});
+
 //inserir ferramenta
 router.post("/", (request, response, next) => {
   mysql.getConnection((error, conn) => {
@@ -62,43 +98,6 @@ router.post("/", (request, response, next) => {
           },
         };
         return response.status(201).send({ res });
-      }
-    );
-  });
-});
-
-//Buscar Ferramenta específica
-router.get("/:id_tool", (request, response, next) => {
-  mysql.getConnection((error, conn) => {
-    if (error) {
-      return response.status(500).send({ error: error });
-    }
-    conn.query(
-      "SELECT * FROM tools WHERE id_tools = ?;",
-      [request.params.id_tool],
-      (error, result, field) => {
-        if (error) {
-          return response.status(500).send({ error: error });
-        }
-        if (result.length == 0) {
-          return response
-            .status(404)
-            .send({ message: "Sem ferramentas com esse ID" });
-        }
-        const res = {
-          ferramenta: {
-            id_tools: result[0].id_tools,
-            name: result[0].name,
-            owner: result[0].owner,
-            price: result[0].price,
-            req: {
-              type: "GET",
-              description: "Retorna uma ferramenta",
-              url: "http://localhost:3000/tools/" +request.body.id_tools,
-            },
-          },
-        };
-        return response.status(200).send({ res });
       }
     );
   });
@@ -158,20 +157,19 @@ router.delete("/", (request, response, next) => {
           return response.status(500).send({ error: error });
         }
         const res = {
-          message: 'Ferramenta removida',
+          message: "Ferramenta removida",
           req: {
-            type: 'DELETE',
-            description: 'Deleta uma ferramenta',
-            url: 'http://localhost:3000/tools',
+            type: "DELETE",
+            description: "Deleta uma ferramenta",
+            url: "http://localhost:3000/tools",
             body: {
-              name: 'String',
-              owner: 'String',
-              price: 'Number'
-            }
-
-          }
-        }
-        return response.status(202).send({res});
+              name: "String",
+              owner: "String",
+              price: "Number",
+            },
+          },
+        };
+        return response.status(202).send({ res });
       }
     );
   });
